@@ -1,7 +1,14 @@
+using Microsoft.Extensions.Options;
+using Northwind.Grpc.Client.Mvc;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddGrpcClient<Greeter.GreeterClient>("Greeter",o =>
+{
+    o.Address = new Uri("https://localhost:5131");
+});
 
 var app = builder.Build();
 
