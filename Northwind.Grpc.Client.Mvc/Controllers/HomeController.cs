@@ -32,7 +32,9 @@ namespace Northwind.Grpc.Client.Mvc.Controllers
                 //    new ShipperRequest { ShipperId = id });
 
                 AsyncUnaryCall<ShipperReply> shipperCall =
-                    _shipperClient.GetShipperAsync(new ShipperRequest() {ShipperId = id});
+                    _shipperClient.GetShipperAsync(new ShipperRequest() {ShipperId = id},
+                        // Deadline must be a UTC DateTime.
+                        deadline: DateTime.UtcNow.AddSeconds(3));
 
                 var metadata = await shipperCall.ResponseHeadersAsync;
                 foreach (var entry in metadata)
@@ -45,6 +47,12 @@ namespace Northwind.Grpc.Client.Mvc.Controllers
                 model.ShipperSummary = "Shipper from gRPC service: " +
                                        $"ID: {shipperReply.ShipperId}, Name: {shipperReply.CompanyName},"
                                        + $" Phone: {shipperReply.Phone}.";
+            }
+            catch (RpcException rpcex) when (rpcex.StatusCode ==
+                                             global::Grpc.Core.StatusCode.DeadlineExceeded)
+            {
+                _logger.LogWarning("Northwind.Grpc.Service deadline exceeded.");
+                model.ErrorMessage = rpcex.Message;
             }
             catch (Exception ex)
             {

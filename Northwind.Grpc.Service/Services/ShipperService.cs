@@ -19,6 +19,8 @@ namespace Northwind.Grpc.Service.Services
 
         public override async Task<ShipperReply> GetShipper(ShipperRequest request, ServerCallContext context)
         {
+            _logger.LogCritical($"This request has a deadline of {context.Deadline:T}. It is now {DateTime.UtcNow:T}.");
+            //await Task.Delay(TimeSpan.FromSeconds(5));
             var shipper = await _dbContext.Shippers.FindAsync(request.ShipperId);
 
             return shipper is null ? null : ToReply(shipper);
