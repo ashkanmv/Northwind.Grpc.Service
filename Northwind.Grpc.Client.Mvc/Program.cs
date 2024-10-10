@@ -9,6 +9,10 @@ builder.Services.AddGrpcClient<Greeter.GreeterClient>("Greeter",o =>
 {
     o.Address = new Uri("https://localhost:5131");
 });
+builder.Services.AddGrpcClient<Shipper.ShipperClient>("Shipper",o =>
+{
+    o.Address = new Uri("https://localhost:5131");
+});
 
 var app = builder.Build();
 

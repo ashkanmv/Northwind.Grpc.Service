@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <None Remove="Protos\greet.proto" />
+    <None Remove="Protos\shipper.proto" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +22,7 @@
 
   <ItemGroup>
     <Protobuf Include="Protos\greet.proto" GrpcServices="Client" />
+    <Protobuf Include="Protos\shipper.proto" GrpcServices="Client" />
   </ItemGroup>
 
 </Project>

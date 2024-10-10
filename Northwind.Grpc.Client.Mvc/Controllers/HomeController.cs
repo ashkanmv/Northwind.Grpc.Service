@@ -9,13 +9,15 @@ namespace Northwind.Grpc.Client.Mvc.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly Greeter.GreeterClient _greeterClient;
+        private readonly Shipper.ShipperClient _shipperClient;
         public HomeController(ILogger<HomeController> logger,GrpcClientFactory factory)
         {
             _logger = logger;
             _greeterClient = factory.CreateClient<Greeter.GreeterClient>("Greeter");
+            _shipperClient = factory.CreateClient<Shipper.ShipperClient>("Shipper");
         }
 
-        public async Task<IActionResult> Index(string name = "Ashkan")
+        public async Task<IActionResult> Index(string name = "Ashkan",int id = 1)
         {
             HomeIndexViewModel model = new();
             try
@@ -25,6 +27,11 @@ namespace Northwind.Grpc.Client.Mvc.Controllers
                     Name = name
                 });
                 model.Greeting = "Greeting from gRPC service: " + result.Message;
+                ShipperReply shipperReply = await _shipperClient.GetShipperAsync(
+                    new ShipperRequest { ShipperId = id });
+                model.ShipperSummary = "Shipper from gRPC service: " +
+                                       $"ID: {shipperReply.ShipperId}, Name: {shipperReply.CompanyName},"
+                                       + $" Phone: {shipperReply.Phone}.";
             }
             catch (Exception ex)
             {
