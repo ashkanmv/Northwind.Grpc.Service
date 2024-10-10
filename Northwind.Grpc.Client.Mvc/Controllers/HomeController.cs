@@ -3,20 +3,39 @@ using Northwind.Grpc.Client.Mvc.Models;
 using System.Diagnostics;
 using Grpc.Core;
 using Grpc.Net.ClientFactory;
+using Google.Protobuf.WellKnownTypes;
 
 namespace Northwind.Grpc.Client.Mvc.Controllers
 {
     public class HomeController : Controller
     {
+        private const decimal NanoFactor = 1_000_000_000;
         private readonly ILogger<HomeController> _logger;
         private readonly Greeter.GreeterClient _greeterClient;
         private readonly Shipper.ShipperClient _shipperClient;
+        private readonly Product.ProductClient _productClient;
+
         public HomeController(ILogger<HomeController> logger,GrpcClientFactory factory)
         {
             _logger = logger;
             _greeterClient = factory.CreateClient<Greeter.GreeterClient>("Greeter");
             _shipperClient = factory.CreateClient<Shipper.ShipperClient>("Shipper");
+            _productClient = factory.CreateClient<Product.ProductClient>("Product");
         }
+
+        public async Task<IActionResult> Products(decimal minimumPrice = 0M)
+        {
+            long units = decimal.ToInt64(minimumPrice);
+            int nanos = decimal.ToInt32((minimumPrice - units) * NanoFactor);
+            ProductsReply reply = await _productClient.GetProductsMinimumPriceAsync(
+                new ProductsMinimumPriceRequest() { MinimumPrice = new DecimalValue()
+                {
+                    Nanos = nanos,
+                    Units = units
+                } });
+            return View(reply.Products);
+        }
+
 
         public async Task<IActionResult> Index(string name = "Ashkan",int id = 1)
         {

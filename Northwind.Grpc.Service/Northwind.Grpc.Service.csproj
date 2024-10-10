@@ -9,8 +9,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Converters\DecimalValue.Converters.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Converters\DecimalValue.Converters.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\shipper.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\decimal.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\product.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\employee.proto" GrpcServices="Server" />
   </ItemGroup>
 
   <ItemGroup>
