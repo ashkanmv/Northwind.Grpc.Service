@@ -1,3 +1,5 @@
+using Grpc.Core;
+using Grpc.Net.Client.Configuration;
 using Microsoft.Extensions.Options;
 using Northwind.Grpc.Client.Mvc;
 using Northwind.Grpc.Client.Mvc.Interceptors;
@@ -7,9 +9,27 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddSingleton<ClientLoggingInterceptor>();
 builder.Services.AddControllersWithViews();
+MethodConfig configForAllMethods = new()
+{
+    Names = { MethodName.Default },
+    RetryPolicy = new RetryPolicy
+    {
+        MaxAttempts = 5,
+        InitialBackoff = TimeSpan.FromSeconds(1),
+        MaxBackoff = TimeSpan.FromSeconds(5),
+        BackoffMultiplier = 1.5,
+        RetryableStatusCodes = { StatusCode.Unavailable }
+    }
+};
 builder.Services.AddGrpcClient<Greeter.GreeterClient>("Greeter",o =>
 {
     o.Address = new Uri("https://localhost:5131");
+}).ConfigureChannel(ch =>
+{
+    ch.ServiceConfig = new ServiceConfig()
+    {
+        MethodConfigs = {configForAllMethods}
+    };
 });
 builder.Services.AddGrpcClient<Shipper.ShipperClient>("Shipper",o =>
 {
