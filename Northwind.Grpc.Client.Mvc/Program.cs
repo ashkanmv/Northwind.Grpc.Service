@@ -1,9 +1,11 @@
 using Microsoft.Extensions.Options;
 using Northwind.Grpc.Client.Mvc;
+using Northwind.Grpc.Client.Mvc.Interceptors;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddSingleton<ClientLoggingInterceptor>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddGrpcClient<Greeter.GreeterClient>("Greeter",o =>
 {
@@ -17,7 +19,7 @@ builder.Services.AddGrpcClient<Product.ProductClient>("Product",
     options =>
     {
         options.Address = new Uri("https://localhost:5131");
-    });
+    }).AddInterceptor<ClientLoggingInterceptor>();
 builder.Services.AddGrpcClient<Employee.EmployeeClient>("Employee",
     options =>
     {
